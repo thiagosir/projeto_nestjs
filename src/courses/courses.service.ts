@@ -25,7 +25,7 @@ export class CoursesService {
     }
 
     findOne(id: string) {
-        const course = this.courseRepository.findOne({ where: { id: +id }, relations: ['tags']});
+        const course = this.courseRepository.findOne({ where: { id: id }, relations: ['tags']});
 
         if (!course) {
             throw new NotFoundException(`Course ID ${id} not found`)
@@ -52,7 +52,7 @@ export class CoursesService {
             await Promise.all(updateCourseDto.tags.map((name) => this.preloadTagByName(name)))
         );
         const course = await this.courseRepository.preload({
-            id: +id,
+            id: id,
             ...updateCourseDto,
             tags,
         });
@@ -65,7 +65,7 @@ export class CoursesService {
     }
 
     async remove(id: string) {
-        const course = await this.courseRepository.findOneBy({ id: +id });
+        const course = await this.courseRepository.findOneBy({ id: id });
 
         if (!course) {
             throw new NotFoundException(`Course ID ${id} not found`)
