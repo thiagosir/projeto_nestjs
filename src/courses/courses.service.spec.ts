@@ -25,4 +25,19 @@ describe('CoursesService', () => {
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
+    describe('findOne', () => {
+        describe('Buscar curso pelo ID', () => {
+            it('Deve retornar o obejto course', async () => {
+                const courseId = ''
+                const expectedCourse = {};
+
+                const course = await service.findOne(id, courseId);
+                expect(course).toEqual(expectedCourse);
+            });
+
+            it('Deve retornar um NOTFOUNDEXCEPTION', () => {
+
+            });
+        })
+    })
 });
