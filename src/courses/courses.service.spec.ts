@@ -1,25 +1,34 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CoursesService } from './courses.service';
-import { Connection } from 'typeorm';
+import { Connection, Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Tag } from './entities/tag.entity';
 import { Course } from './entities/course.entity';
+import { NotFoundException } from '@nestjs/common';
+
+type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
+
+const createMockRepository = <T = any>(): MockRepository<T> => ({
+    findOne: jest.fn(),
+});
 
 describe('CoursesService', () => {
     let service: CoursesService;
+    let courseRepository: MockRepository;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 CoursesService,
                 { provide: Connection, useValue: {} },
-                { provide: getRepositoryToken(Course), useValue: {} },
-                { provide: getRepositoryToken(Tag), useValue: {} },
+                { provide: getRepositoryToken(Course), useValue: createMockRepository() },
+                { provide: getRepositoryToken(Tag), useValue: createMockRepository() },
 
             ],
         }).compile();
 
         service = module.get<CoursesService>(CoursesService);
+        courseRepository = module.get<MockRepository>(getRepositoryToken(Course));
     });
 
     it('should be defined', () => {
@@ -28,15 +37,23 @@ describe('CoursesService', () => {
     describe('findOne', () => {
         describe('Buscar curso pelo ID', () => {
             it('Deve retornar o obejto course', async () => {
-                const courseId = ''
+                const courseId = '1'
                 const expectedCourse = {};
 
-                const course = await service.findOne(id, courseId);
+                courseRepository.findOne.mockReturnValue(expectedCourse)
+                const course = await service.findOne(courseId);
                 expect(course).toEqual(expectedCourse);
             });
 
-            it('Deve retornar um NOTFOUNDEXCEPTION', () => {
-
+            it('Deve retornar um NotFoundException', async () => {
+                const courseId = '1'
+                courseRepository.findOne.mockReturnValue(undefined)
+                try {
+                    await service.findOne(courseId);
+                } catch (error) {
+                    expect(error).toBeInstanceOf(NotFoundException);
+                    expect(error.message).toEqual(`Course ID ${courseId} not found`)
+                }
             });
         })
     })
