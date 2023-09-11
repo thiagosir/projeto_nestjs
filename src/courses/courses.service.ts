@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Course } from './entities/course.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -9,23 +9,24 @@ import { Tag } from './entities/tag.entity';
 @Injectable()
 export class CoursesService {
     constructor(
-        @InjectRepository(Course)
+        @Inject('COURSES_REPOSITORY')
         private readonly courseRepository: Repository<Course>,
 
-        @InjectRepository(Tag)
+        @Inject('TAGS_REPOSITORY')
         private readonly tagRepository: Repository<Tag>
-    ) {
+    ) {}
 
-    }
-
-    findAll() {
+    async findAll() {
         return this.courseRepository.find({
             relations: ['tags']
         });
     }
 
-    findOne(id: string) {
-        const course = this.courseRepository.findOne({ where: { id: id }, relations: ['tags']});
+    async findOne(id: number) {
+        const course = await this.courseRepository.findOne({ 
+            where: { id }, 
+            relations: ['tags']
+        });
 
         if (!course) {
             throw new NotFoundException(`Course ID ${id} not found`)
@@ -52,7 +53,7 @@ export class CoursesService {
             await Promise.all(updateCourseDto.tags.map((name) => this.preloadTagByName(name)))
         );
         const course = await this.courseRepository.preload({
-            id: id,
+            id: +id,
             ...updateCourseDto,
             tags,
         });
@@ -64,8 +65,10 @@ export class CoursesService {
         return this.courseRepository.save(course);
     }
 
-    async remove(id: string) {
-        const course = await this.courseRepository.findOneBy({ id: id });
+    async remove(id: number) {
+        const course = await this.courseRepository.findOne({ 
+            where: { id }, 
+        });
 
         if (!course) {
             throw new NotFoundException(`Course ID ${id} not found`)

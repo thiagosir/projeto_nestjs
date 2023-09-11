@@ -2,5 +2,5 @@
 
 npm install 
 npm run build
-npx typeorm-ts-node-commonjs migration:run -d ./ormconfig.ts
+npx typeorm migration:run -d dist/database.providers.js
 npm run start:dev
