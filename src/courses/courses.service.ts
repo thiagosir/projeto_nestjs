@@ -7,13 +7,11 @@ import { Tag } from './entities/tag.entity';
 
 @Injectable()
 export class CoursesService {
-    constructor(
-        @Inject('COURSES_REPOSITORY')
-        private readonly courseRepository: Repository<Course>,
+    @Inject('COURSES_REPOSITORY')
+    private readonly courseRepository: Repository<Course>;
 
-        @Inject('TAGS_REPOSITORY')
-        private readonly tagRepository: Repository<Tag>
-    ) {}
+    @Inject('TAGS_REPOSITORY')
+    private readonly tagRepository: Repository<Tag>;
 
     async findAll() {
         return this.courseRepository.find({
@@ -77,7 +75,7 @@ export class CoursesService {
     }
 
     private async preloadTagByName(name: string): Promise<Tag> {
-        const tag = await this.tagRepository.findOneBy({ name });
+        const tag = await this.tagRepository.findOne({ where: { name } });
 
         if (tag) {
             return tag
