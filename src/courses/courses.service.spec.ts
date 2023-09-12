@@ -1,10 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { CoursesService } from './courses.service';
-import { Connection, Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Tag } from './entities/tag.entity';
-import { Course } from './entities/course.entity';
-import { NotFoundException } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto/update-course.dto';
 
@@ -12,7 +6,6 @@ describe('CoursesService', () => {
     let service: CoursesService;
     let id;
     let date;
-
 
     beforeEach(async () => {
         service = new CoursesService();
@@ -201,28 +194,4 @@ describe('CoursesService', () => {
         expect(mockCourseRepository.remove).toHaveBeenCalled();
         expect(expectOutputCourse).toStrictEqual(course);
     });
-
-    // describe('findOne', () => {
-    //     describe('Buscar curso pelo ID', () => {
-    //         it('Deve retornar o obejto course', async () => {
-    //             const courseId = '1'
-    //             const expectedCourse = {};
-
-    //             courseRepository.findOne.mockReturnValue(expectedCourse)
-    //             const course = await service.findOne(courseId);
-    //             expect(course).toEqual(expectedCourse);
-    //         });
-
-    //         it('Deve retornar um NotFoundException', async () => {
-    //             const courseId = '1'
-    //             courseRepository.findOne.mockReturnValue(undefined)
-    //             try {
-    //                 await service.findOne(courseId);
-    //             } catch (error) {
-    //                 expect(error).toBeInstanceOf(NotFoundException);
-    //                 expect(error.message).toEqual(`Course ID ${courseId} not found`)
-    //             }
-    //         });
-    //     })
-    // })
 });
